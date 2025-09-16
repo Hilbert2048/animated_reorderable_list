@@ -347,6 +347,13 @@ class AnimatedReorderableGridView<E extends Object> extends StatefulWidget {
   /// Defaults to true.
   final bool enableSwap;
 
+  /// Whether to animate list updates (insertion and removal).
+  ///
+  /// When set to true, items will be inserted and removed with animation.
+  /// When set to false, items will be inserted and removed immediately without animation.
+  /// Defaults to true.
+  final bool animatedUpdate;
+
   /// Creates a [AnimatedReorderableGridView] that enables users to interactively reorder items through dragging,
   /// with animated insertion and removal of items.
   const AnimatedReorderableGridView(
@@ -381,7 +388,8 @@ class AnimatedReorderableGridView<E extends Object> extends StatefulWidget {
       this.dragStartDelay = const Duration(milliseconds: 500),
       this.nonDraggableItems = const [],
       this.lockedItems = const [],
-      this.enableSwap = true})
+      this.enableSwap = true,
+      this.animatedUpdate = true})
       : super(key: key);
 
   /// The state from the closest instance of this class that encloses the given
@@ -473,6 +481,7 @@ class AnimatedReorderableGridViewState<E extends Object>
               nonDraggableItems: widget.nonDraggableItems,
               lockedItems: widget.lockedItems,
               enableSwap: widget.enableSwap,
+              animatedUpdate: widget.animatedUpdate,
             ),
           ),
         ]);

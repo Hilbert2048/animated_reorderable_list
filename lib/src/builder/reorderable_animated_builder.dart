@@ -515,7 +515,7 @@ class ReorderableAnimatedBuilderState extends State<ReorderableAnimatedBuilder>
     return index;
   }
 
-  void insertItem(int index, {required Duration insertDuration}) {
+  void insertItem(int index, {required Duration insertDuration, bool animate = true}) {
     assert(index >= 0);
     final int itemIndex = _indexToItemIndex(index);
     assert(itemIndex >= 0 && itemIndex <= _itemsCount);
@@ -525,6 +525,32 @@ class ReorderableAnimatedBuilderState extends State<ReorderableAnimatedBuilder>
     }
     for (final _ActiveItem item in _outgoingItems) {
       if (item.itemIndex >= itemIndex) item.itemIndex += 1;
+    }
+
+    if (!animate) {
+      final updatedChildrenMap = <int, ItemTransitionData>{};
+      
+      if (childrenMap.containsKey(itemIndex)) {
+        for (final entry in childrenMap.entries) {
+          if (entry.key == itemIndex) {
+            updatedChildrenMap[itemIndex] = ItemTransitionData(visible: true);
+            updatedChildrenMap[entry.key + 1] = entry.value;
+          } else if (entry.key > itemIndex) {
+            updatedChildrenMap[entry.key + 1] = entry.value;
+          } else {
+            updatedChildrenMap[entry.key] = entry.value;
+          }
+        }
+        childrenMap.clear();
+        childrenMap.addAll(updatedChildrenMap);
+      } else {
+        childrenMap[itemIndex] = ItemTransitionData();
+      }
+      
+      setState(() {
+        _itemsCount += 1;
+      });
+      return;
     }
 
     final AnimationController controller = AnimationController(
@@ -588,7 +614,7 @@ class ReorderableAnimatedBuilderState extends State<ReorderableAnimatedBuilder>
     });
   }
 
-  void removeItem(int index, {required Duration removeItemDuration}) {
+  void removeItem(int index, {required Duration removeItemDuration, bool animate = true}) {
     assert(index >= 0);
     final int itemIndex = _indexToItemIndex(index);
     if (itemIndex < 0 || itemIndex >= _itemsCount) {
@@ -597,6 +623,18 @@ class ReorderableAnimatedBuilderState extends State<ReorderableAnimatedBuilder>
     assert(itemIndex >= 0 && itemIndex < _itemsCount);
 
     assert(_activeItemAt(_outgoingItems, itemIndex) == null);
+
+    if (!animate) {
+      // Decrement the incoming and outgoing item indices to account for the removal.
+      for (final _ActiveItem item in _incomingItems) {
+        if (item.itemIndex > itemIndex) item.itemIndex -= 1;
+      }
+      for (final _ActiveItem item in _outgoingItems) {
+        if (item.itemIndex > itemIndex) item.itemIndex -= 1;
+      }
+      _onItemRemoved(index, removeItemDuration);
+      return;
+    }
 
     if (childrenMap.containsKey(index)) {
       final _ActiveItem? incomingItem =

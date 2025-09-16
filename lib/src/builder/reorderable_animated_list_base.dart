@@ -38,6 +38,7 @@ abstract class ReorderableAnimatedListBase<W extends Widget, E extends Object>
   final List<E> nonDraggableItems;
   final List<E> lockedItems;
   final bool enableSwap;
+  final bool animatedUpdate;
 
   const ReorderableAnimatedListBase(
       {Key? key,
@@ -60,6 +61,7 @@ abstract class ReorderableAnimatedListBase<W extends Widget, E extends Object>
       this.isSameItem,
       this.dragStartDelay,
       this.enableSwap = true,
+      this.animatedUpdate = true,
       required this.nonDraggableItems,
       required this.lockedItems})
       : assert(itemBuilder != null),
@@ -269,14 +271,14 @@ abstract class ReorderableAnimatedListBaseState<
     for (int i = oldList.length - 1; i >= 0; i--) {
       if (newList.indexWhere((element) => isSameItem(oldList[i], element)) ==
           -1) {
-        listKey.currentState!.removeItem(i, removeItemDuration: removeDuration);
+        listKey.currentState!.removeItem(i, removeItemDuration: removeDuration, animate: widget.animatedUpdate);
       }
     }
     // Detect added items
     for (int i = 0; i < newList.length; i++) {
       if (oldList.indexWhere((element) => isSameItem(newList[i], element)) ==
           -1) {
-        listKey.currentState!.insertItem(i, insertDuration: insertDuration);
+        listKey.currentState!.insertItem(i, insertDuration: insertDuration, animate: widget.animatedUpdate);
       }
     }
   }
