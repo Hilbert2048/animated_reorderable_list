@@ -668,9 +668,11 @@ class ReorderableAnimatedBuilderState extends State<ReorderableAnimatedBuilder>
         } else if (entry.key == itemIndex) {
           continue;
         } else {
+          final pre = childrenMap[entry.key - 1];
+          final cur = childrenMap[entry.key];
           updatedChildrenMap[entry.key - 1] = childrenMap[entry.key]!.copyWith(
-              startOffset: _itemOffsetAt(entry.key),
-              endOffset: _itemOffsetAt(entry.key - 1),
+              startOffset: cur?.startOffset ?? _itemOffsetAt(entry.key),
+              endOffset: pre?.startOffset ?? _itemOffsetAt(entry.key - 1),
               animate: isGrid);
         }
       }
