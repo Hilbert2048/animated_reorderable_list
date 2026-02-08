@@ -515,7 +515,8 @@ class ReorderableAnimatedBuilderState extends State<ReorderableAnimatedBuilder>
     return index;
   }
 
-  void insertItem(int index, {required Duration insertDuration, bool animate = true}) {
+  void insertItem(int index,
+      {required Duration insertDuration, bool animate = true}) {
     assert(index >= 0);
     final int itemIndex = _indexToItemIndex(index);
     assert(itemIndex >= 0 && itemIndex <= _itemsCount);
@@ -529,7 +530,7 @@ class ReorderableAnimatedBuilderState extends State<ReorderableAnimatedBuilder>
 
     if (!animate) {
       final updatedChildrenMap = <int, ItemTransitionData>{};
-      
+
       if (childrenMap.containsKey(itemIndex)) {
         for (final entry in childrenMap.entries) {
           if (entry.key == itemIndex) {
@@ -546,7 +547,7 @@ class ReorderableAnimatedBuilderState extends State<ReorderableAnimatedBuilder>
       } else {
         childrenMap[itemIndex] = ItemTransitionData();
       }
-      
+
       setState(() {
         _itemsCount += 1;
       });
@@ -614,7 +615,8 @@ class ReorderableAnimatedBuilderState extends State<ReorderableAnimatedBuilder>
     });
   }
 
-  void removeItem(int index, {required Duration removeItemDuration, bool animate = true}) {
+  void removeItem(int index,
+      {required Duration removeItemDuration, bool animate = true}) {
     assert(index >= 0);
     final int itemIndex = _indexToItemIndex(index);
     if (itemIndex < 0 || itemIndex >= _itemsCount) {
@@ -789,6 +791,11 @@ class ReorderableAnimatedBuilderState extends State<ReorderableAnimatedBuilder>
   Offset _itemNextOffset(int index) {
     final currentOffset = _itemOffsetAt(index);
     if (!isGrid) {
+      return currentOffset;
+    }
+
+    // Fix: Avoid division by zero if crossAxisCount is not yet initialized
+    if (crossAxisCount < 1) {
       return currentOffset;
     }
 
